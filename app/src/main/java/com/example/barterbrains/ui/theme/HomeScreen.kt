@@ -1,6 +1,7 @@
 package com.example.barterbrains.ui.theme
 
 
+import android.R.attr.onClick
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -17,13 +18,16 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Doorbell
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Explore
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Message
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -45,10 +49,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
+import coil.compose.AsyncImage
+import com.example.barterbrains.Navigation.Screen
 import com.example.barterbrains.R
+import com.example.barterbrains.data.User
 
 @Composable
-fun HomeScreen() {
+fun HomeScreen(navController: NavHostController) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -64,7 +73,7 @@ fun HomeScreen() {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            HomeTopBar()
+            HomeTopBar(navController = navController)
 
             Spacer(modifier = Modifier.height(24.dp))
 
@@ -77,19 +86,18 @@ fun HomeScreen() {
             FeaturedSkill()
             Spacer(modifier = Modifier.height(24.dp))
             PopularCategories()
-            Spacer(modifier = Modifier.height(24.dp))
-            BottomNavBar()
+
         }
     }
 }
 
 @Composable
-fun HomeTopBar() {
+fun HomeTopBar(navController: NavHostController) {
 
     Row(
         modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
 
         Row(
@@ -113,7 +121,18 @@ fun HomeTopBar() {
                 fontWeight = FontWeight.Bold,
                 color = Color(0xFF3D2CFF)
             )
+            Spacer(modifier = Modifier.width(50.dp))
         }
+        Icon(
+            imageVector = Icons.Default.Notifications,
+            contentDescription = "Inbox Icon",
+            modifier = Modifier.size(24.dp)
+                .clickable{
+                    navController.navigate(Screen.Inbox.route)
+                },
+            tint = Color.Gray,
+
+        )
 
 
     }
@@ -389,7 +408,7 @@ fun CategoryCard(
 }
 
 @Composable
-fun BottomNavBar() {
+fun BottomNavBar(navController: NavHostController) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -405,23 +424,33 @@ fun BottomNavBar() {
         BottomNavItem(
             title = "Home",
             icon = Icons.Default.Home,
-            isSelected = false
+            isSelected = false,
+            onClick = { navController.navigate(Screen.Home.route) }
         )
         BottomNavItem(
             title = "Explore",
             icon = Icons.Default.Explore,
-            isSelected = false
+            isSelected = false,
+            onClick = {
+                navController.navigate(Screen.Explore.route)
+            }
         )
         BottomNavItem(
             title = "Message",
             icon = Icons.Default.Email,
-            isSelected = false
+            isSelected = false,
+            onClick = {
+                navController.navigate(Screen.Chat.route)
+            }
         )
         BottomNavItem(
             title = "Profile",
 
             icon = Icons.Default.Person,
-            isSelected = false
+            isSelected = false,
+            onClick = {
+                navController.navigate(Screen.Profile.route)
+            }
         )
     }
 }
@@ -429,11 +458,15 @@ fun BottomNavBar() {
 @Composable
 fun BottomNavItem(
     title: String,
-    icon : ImageVector,
-    isSelected : Boolean
+    icon: ImageVector,
+    isSelected: Boolean,
+    onClick: () -> Unit
 ) {
     Column(
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.clickable {
+            onClick()
+        }
     ) {
         Box(
             modifier = Modifier
@@ -470,11 +503,58 @@ fun BottomNavItem(
     }
 }
 
-@Preview
 @Composable
-fun HomeScreenPreview() {
-     HomeScreen()
-    //SkillCard()
-    //BottomNavBar()
+fun UserCard(user: User) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            AsyncImage(
+                model = user.profileImageUrl,
+
+                contentDescription = "Profile Image",
+
+                modifier = Modifier
+                    .size(80.dp)
+                    .clip(CircleShape),
+
+                contentScale = ContentScale.Crop
+            )
+
+            Spacer(modifier = Modifier.width(16.dp))
+            Column {
+                Text(
+                    text = user.fullName,
+                )
+                Text(
+                    text = user.bio
+
+                )
+                Text(
+                    text = "Skills: ${user.skillsHave.joinToString()}"
+                )
+                Text(
+                    text = "Skills: ${user.skillsWant.joinToString()}"
+                )
+            }
+
+        }
+    }
 }
 
+@Preview(showBackground = true)
+@Composable
+fun HomeScreenPreview() {
+
+    val navController = rememberNavController()
+
+    HomeScreen(navController)
+//UserCard(user = User())
+}

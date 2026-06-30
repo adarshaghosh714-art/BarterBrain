@@ -43,6 +43,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
 import com.example.barterbrains.R
 import com.example.barterbrains.data.User
 
@@ -53,7 +55,9 @@ private val LightOrange = Color(0xFFFFE3D3)
 private val OrangeText = Color(0xFFCC6B2C)
 
 @Composable
-fun profileScreen(user: User) {
+fun profileScreen(user: User,
+                  navController: NavHostController
+) {
     Scaffold(
         containerColor = Background,
         bottomBar = {
@@ -336,9 +340,7 @@ fun LocationCard(
     }
 }
 
-// ==========================
-// SAVE BUTTON
-// ==========================
+
 
 @Composable
 fun BottomSaveButton() {
@@ -371,11 +373,4 @@ fun BottomSaveButton() {
 }
 
 
-@Preview(
-    showBackground = true,
-    showSystemUi = true
-)
-@Composable
-fun ProfilePreview() {
-    profileScreen(user = User())
-}
+
